@@ -11,7 +11,8 @@
 <script language='javascript' src='/opac/common/js/fmall.js'> </script>
 <script language='javascript' src='/opac/common/js/fmgen.js'> </script>
 <script language='javascript' src='/opac/common/js/opac_utils.js'> </script>
-<script language='javascript' src='/opac/common/js/en/OrgTree.js'> </script>
+<script language='javascript' src='/opac/common/js/en-US/OrgTree.js'> </script>
+<script language='javascript' src='/opac/common/js/org_utils.js'> </script>
 <script language='javascript' src='/opac/common/js/init.js'> </script>
 <script language='javascript' src='/opac/common/js/RemoteRequest.js'> </script>
 
@@ -21,7 +22,7 @@
 <script language='javascript'> 
 jQuery.noConflict(); 
 
-bbags = [153169,153171];
+bbags = [1];
 </script> 
 
 
