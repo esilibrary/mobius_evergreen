@@ -3,52 +3,58 @@
 
 function bbInit(bb) {
 	if(!bb) { return; }
-	new OpenSRF.ClientSession('open-ils.actor').request({
-		method: 'open-ils.actor.container.public.flesh',
-		params: ['biblio', bb],
-		async: true,
-		oncomplete: bbShow
-	}).send();
+    jQuery.ajax({
+        url : '/opac/extras/feed/bookbag/atom/' + bb,
+        dataType : 'xml'
+    }).done(function(data) {
+        bbShow(bb, data);
+/*
+        console.debug('got it for ' + bb);
+        console.debug(data);
+        jQuery('entry', data).each(function(i, entry) {
+            bbShow(bbId, entry);
+        });
+*/
+    });
 }
 
-function bbShow(r) {
+function bbShow(bbId, data) {
 
-	var resp = r.recv();
-	if (!resp) { return; }
-	var bb = resp.content();
-	if(!bb || !bb.pub()) { return; }
-	var thisid = bb.id();	
-	bb_total[thisid]=bb.items().length;
-	
-	$('bb_name_'+thisid).appendChild(text(bb.name()));
+	var thisid = bbId;
+	bb_total[thisid] = jQuery('entry', data).length;
+
+	//$('bb_name_'+thisid).appendChild(text(jQuery('feed', data).children('title').text()));
+	$('bb_name_'+thisid).append(jQuery('feed', data).children('title').text());
 
 	var tbody = $('bbitems_'+thisid);
 	
 	if(!template[thisid]) 	
 		template[thisid] = tbody.removeChild($('row_template_'+thisid));
-	
-	for( var i in bb.items() ) 
-		tbody.appendChild(bbShowItem( template[thisid], bb.items()[i] ));
+
+    jQuery('entry', data).each(function(i, entry) {
+		tbody.appendChild(bbShowItem( template[thisid], entry ));
+    });
+}
+
+function getBibId(item) {
+    var id = '';
+    jQuery('id', item).each(function(i, val) {
+        matches = jQuery(val).text().match(/biblio-record_entry\/([0-9]+)/);
+        if (matches == null) return;
+        id = matches[1];
+    });
+    return id;
 }
 
 function bbShowItem( template, item ) {
 	var row = template.cloneNode(true);
-	var tlink = $n(row, 'title');
-	var alink = $n(row, 'author');	
+	var tlink = jQuery('a[name=title]', row);
+	var alink = jQuery('span[name=author]', row);	
+    var bib_id = getBibId(item);
 
-	new OpenSRF.ClientSession('open-ils.search').request({
-		method: 'open-ils.search.biblio.record.mods_slim.retrieve',
-		params: [item.target_biblio_record_entry()],
-		aysnc: true,
-		oncomplete: function(r) {
-			var resp = r.recv();
-			if (!resp) { return; }
-			var rec = resp.content();
-			buildTitleDetailLink(rec, tlink); 
-			tlink.setAttribute('href', ''+rec.doc_id());
-			alink.appendChild(text(rec.author()));
-		}
-	}).send();
+    tlink.append(jQuery('title', item).text());
+    tlink.attr('href', bib_id);
+    alink.append(jQuery('author', item).text());
 		
 	return row;
 }
@@ -60,7 +66,6 @@ jQuery(document).ready(function(){
 		"<div id='bbitems_"+bbags[i]+"'><div id='row_template_"+bbags[i]+"' class='bbitem_"+bbags[i]+"'><a href='#' name='title' class='bbtitle_"+bbags[i]+"'> </a><span name='author'> </span></div></div>");
 		jQuery('#carousels').append(
 		"<div><div id='bb_name_"+bbags[i]+"' class='carousel_title'> </div><div class='wrap'>  <ul id='mycarousel_"+bbags[i]+"' class='jcarousel-skin-meskin'>  </ul></div></div>");
-		
 		
 		bbInit(bbags[i]);
 	}
