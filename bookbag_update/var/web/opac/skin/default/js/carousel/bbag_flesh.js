@@ -24,7 +24,7 @@ function bbShow(bbId, data) {
 	bb_total[thisid] = jQuery('atom\\:entry, entry', data).length;
 
 	//$('bb_name_'+thisid).appendChild(text(jQuery('feed', data).children('title').text()));
-	$('bb_name_'+thisid).append(jQuery('atom\\:feed, entry', data).children('atom\\:title, title').text());
+	jQuery('bb_name_'+thisid).append(jQuery('atom\\:feed, entry', data).children('atom\\:title, title').text());
 
 	var tbody = $('bbitems_'+thisid);
 	
