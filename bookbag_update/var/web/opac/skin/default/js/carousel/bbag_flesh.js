@@ -21,24 +21,24 @@ function bbInit(bb) {
 function bbShow(bbId, data) {
 
 	var thisid = bbId;
-	bb_total[thisid] = jQuery('entry', data).length;
+	bb_total[thisid] = jQuery('atom\\:entry, entry', data).length;
 
 	//$('bb_name_'+thisid).appendChild(text(jQuery('feed', data).children('title').text()));
-	$('bb_name_'+thisid).append(jQuery('feed', data).children('title').text());
+	$('bb_name_'+thisid).append(jQuery('atom\\:feed, entry', data).children('atom\\:title, title').text());
 
 	var tbody = $('bbitems_'+thisid);
 	
 	if(!template[thisid]) 	
 		template[thisid] = tbody.removeChild($('row_template_'+thisid));
 
-    jQuery('entry', data).each(function(i, entry) {
+    jQuery('atom\\:entry, entry', data).each(function(i, entry) {
 		tbody.appendChild(bbShowItem( template[thisid], entry ));
     });
 }
 
 function getBibId(item) {
     var id = '';
-    jQuery('id', item).each(function(i, val) {
+    jQuery('atom\\:id, id', item).each(function(i, val) {
         matches = jQuery(val).text().match(/biblio-record_entry\/([0-9]+)/);
         if (matches == null) return;
         id = matches[1];
